@@ -25,16 +25,29 @@ async function fetchGitHubRepos() {
         container.innerHTML = ''; // Clear any previous content
 
         // Loop through the repositories and create elements to display them
-        repos.forEach(repo => {
+        repos.forEach(async (repo) => {
             const repoDiv = document.createElement('div');
             repoDiv.classList.add('repo');
-
             repoDiv.innerHTML = `
                 <h3><a href="${repo.url}" target="_blank">${repo.name}</a></h3>
                 <p>${repo.description || 'No description available'}</p>
                 <p><strong>Stars:</strong> ${repo.stars}</p>
             `;
             container.appendChild(repoDiv);
+
+            // Fetch commit activity for each repository
+            const commitsResponse = await fetch(`https://api.github.com/repos/felskeM/${repo.name}/commits`);
+            const commits = await commitsResponse.json();
+
+            if (commits.length > 0) {
+                const commitActivity = document.createElement('div');
+                commitActivity.classList.add('commit-activity');
+                commitActivity.innerHTML = `
+                    <strong>Last commit:</strong> ${commits[0].commit.message}
+                    <p><strong>Date:</strong> ${new Date(commits[0].commit.author.date).toLocaleDateString()}</p>
+                `;
+                repoDiv.appendChild(commitActivity);
+            }
         });
     } catch (error) {
         // Display error message if the fetch fails

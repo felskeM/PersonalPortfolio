@@ -1,8 +1,10 @@
 import requests
-from flask import Flask, jsonify
-from flask_cors import CORS  # Importing CORS
+from flask import Flask, jsonify, render_template
+from flask_cors import CORS
 
-app = Flask(__name__)
+app = Flask(__name__, 
+            template_folder='templates', 
+            static_folder='static')
 CORS(app)  # Enable CORS for all routes
 
 def get_github_data(username):
@@ -26,5 +28,12 @@ def github_repos():
     data = get_github_data(username)
     return jsonify(data)
 
+#7zlj6prbtmemkcauqss763v75edcmt4zcgdo22ionj47sgvwunbp4yyd.onion
+
+@app.route('/')
+def home():
+    return render_template('index.html')
+
 if __name__ == '__main__':
-    app.run(debug=True)
+    # Run the Flask app on localhost port 5000
+    app.run(host='127.0.0.1', port=5000, debug=True)
